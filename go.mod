@@ -46,7 +46,6 @@ require (
 	golang.org/x/oauth2 v0.22.0
 	golang.org/x/text v0.40.0
 	gomod.garykim.dev/nc-talk v0.3.0
-	google.golang.org/protobuf v1.36.11
 	layeh.com/gumble v0.0.0-20221205141517-d1df60a3cc14
 	maunium.net/go/mautrix v0.29.1-0.20260722181210-2ee6142f1dd5
 	modernc.org/sqlite v1.32.0
@@ -142,6 +141,7 @@ require (
 	golang.org/x/time v0.5.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240722135656-d784300faade // indirect
 	google.golang.org/grpc v1.65.0 // indirect
+	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect

@@ -131,12 +131,10 @@ func isGroupJid(identifier string) bool {
 }
 
 func (b *Bwhatsapp) getNewsletterName(jid types.JID) string {
-	defer b.whatsappHandlePanic()
-
 	b.RLock()
-	defer b.RUnlock()
 
 	name, ok := b.newsletterNames[jid.String()]
+	b.RUnlock()
 	if ok {
 		return name
 	}
@@ -144,15 +142,13 @@ func (b *Bwhatsapp) getNewsletterName(jid types.JID) string {
 }
 
 func (b *Bwhatsapp) listNewsletterJIDs() []string {
-	defer b.whatsappHandlePanic()
-
 	b.RLock()
-	defer b.RUnlock()
 
 	jids := make([]string, len(b.subscribedNewsletters))
 	for i, nl := range b.subscribedNewsletters {
 		jids[i] = nl.ID.String()
 	}
+	b.RUnlock()
 	return jids
 }
 

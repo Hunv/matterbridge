@@ -30,14 +30,14 @@ const (
 type Bwhatsapp struct {
 	*bridge.Config
 
-	startedAt            time.Time
-	wc                   *whatsmeow.Client
-	contacts             map[types.JID]types.ContactInfo
-	users                map[string]types.ContactInfo
-	userAvatars          map[string]string
-	joinedGroups         []*types.GroupInfo
+	startedAt             time.Time
+	wc                    *whatsmeow.Client
+	contacts              map[types.JID]types.ContactInfo
+	users                 map[string]types.ContactInfo
+	userAvatars           map[string]string
+	joinedGroups          []*types.GroupInfo
 	subscribedNewsletters []*types.NewsletterMetadata
-	newsletterNames      map[string]string
+	newsletterNames       map[string]string
 }
 
 type Replyable struct {
@@ -64,17 +64,8 @@ func New(cfg *bridge.Config) bridge.Bridger {
 	return b
 }
 
-func (b *Bwhatsapp) whatsappHandlePanic() {
-	r := recover()
-	if r != nil {
-		b.Log.Warnf("Recovered from panic: %#v", r)
-	}
-}
-
 // Connect to WhatsApp. Required implementation of the Bridger interface
 func (b *Bwhatsapp) Connect() error {
-	defer b.whatsappHandlePanic()
-
 	device, err := b.getDevice()
 	if err != nil {
 		return err
@@ -201,8 +192,6 @@ func (b *Bwhatsapp) Disconnect() error {
 // Required implementation of the Bridger interface
 // https://github.com/42wim/matterbridge/blob/2cfd880cdb0df29771bf8f31df8d990ab897889d/bridge/bridge.go#L11-L16
 func (b *Bwhatsapp) JoinChannel(channel config.ChannelInfo) error {
-	defer b.whatsappHandlePanic()
-
 	b.RLock()
 	subscribedNewsletters := b.subscribedNewsletters
 	joinedGroups := b.joinedGroups
@@ -434,16 +423,12 @@ func (b *Bwhatsapp) PostAudioMessage(msg config.Message, filetype string) (strin
 
 // Send a message from the bridge to WhatsApp
 func (b *Bwhatsapp) Send(msg config.Message) (string, error) {
-	defer b.whatsappHandlePanic()
-
 	groupJID, _ := types.ParseJID(msg.Channel)
 
 	// WhatsApp channels (newsletters) are read-only for subscribers;
 	// only the channel owner or admin can post. Check role before sending.
 	if groupJID.Server == types.NewsletterServer {
 		b.RLock()
-		defer b.RUnlock()
-
 		found, canSend := false, false
 		for _, nl := range b.subscribedNewsletters {
 			if nl.ID == groupJID {
@@ -456,6 +441,7 @@ func (b *Bwhatsapp) Send(msg config.Message) (string, error) {
 				break
 			}
 		}
+		b.RUnlock()
 
 		if !found {
 			b.Log.Warnf("Cannot send to unknown newsletter %s: not in subscribed list", groupJID)
